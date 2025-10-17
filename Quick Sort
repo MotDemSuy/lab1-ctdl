@@ -1,5 +1,5 @@
 #include <iostream>
-
+#include <chrono>
 // Cấu trúc của một nút trong danh sách liên kết
 struct Node {
     int data;
@@ -119,13 +119,21 @@ int main() {
     push(&head, 20);
     push(&head, 5);
 
-    std::cout << "Danh sách liên kết ban đầu:" << std::endl;
+    cout << "Danh sách liên kết ban đầu:" << endl;
     printList(head);
+
+    auto start = chrono::high_resolution_clock::now();
 
     quickSort(&head);
 
-    std::cout << "Danh sách liên kết sau khi sắp xếp:" << std::endl;
+    auto end = chrono::high_resolution_clock::now();
+
+    auto duration = chrono::duration_cast<chrono::microseconds>(end - start);
+
+    cout << "Danh sách liên kết sau khi sắp xếp:" << endl;
     printList(head);
+
+    cout << "Thời gian chạy (microseconds): " << duration.count() << " µs" << endl;
 
     return 0;
 }
