@@ -47,14 +47,14 @@ ListNode* generateRandomList(int n, int minVal = 0, int maxVal = 1000) {
     return head;
 }
 
-/*void printList(ListNode* head) {
+void printList(ListNode* head) {
     while (head) {
         cout << head->val << " ";
         head = head->next;
     }
     cout << endl;
 }
-*/
+
 void freeList(ListNode* head) {
     while (head) {
         ListNode* tmp = head;
@@ -64,21 +64,21 @@ void freeList(ListNode* head) {
 }
 
 int main() {
-    int n = 10000; 
-    ListNode* head = generateRandomList(n, 0, 10000);
+    int n = 10; 
+    ListNode* head = generateRandomList(n, 0, 100);
 
-/*  cout << "Danh sach ban dau: ";
+    cout << "Danh sach ban dau: ";
     printList(head);
-*/
+
     InsertionSort sorter;
 
     auto start = chrono::high_resolution_clock::now();
     ListNode* sorted = sorter.insertionSortList(head);
     auto end = chrono::high_resolution_clock::now();
-/*
+
     cout << "Danh sach sau khi sap xep: ";
     printList(sorted);
-*/
+
     chrono::duration<double, milli> duration = end - start;
     cout << "Thoi gian thuc hien: " << duration.count() << " ms" << endl;
 
