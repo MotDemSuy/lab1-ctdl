@@ -1,12 +1,15 @@
 #include <iostream>
 #include <chrono>
+#include <random>
 using namespace std;
+
 struct Node {
     int val;
     Node* next;
     Node(int v = 0) : val(v), next(nullptr) {}
 };
 
+// ===== Thêm vào cuối danh sách =====
 void push_back(Node*& head, int v) {
     if (!head) {
         head = new Node(v);
@@ -17,115 +20,105 @@ void push_back(Node*& head, int v) {
     cur->next = new Node(v);
 }
 
-Node* readlist1() {
-    int n;
-    cout << "Nhap so phan tu cua day a:\n";
-    if(!(cin >> n)) return nullptr;
+// ===== Sinh danh sách ngẫu nhiên =====
+Node* randomList(int n, int minVal = 0, int maxVal = 1000) {
     Node* head = nullptr;
-    cout << "Nhap cac phan tu cua day a:\n";
-    for (int i = 0; i < n; ++i) {
-        int x; cin >> x;
-        push_back(head, x);
-}
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> dist(minVal, maxVal);
+    for (int i = 0; i < n; ++i)
+        push_back(head, dist(gen));
     return head;
 }
 
-Node* readlist2() {
-    int n;
-    cout << "Nhap so phan tu cua day b:\n";
-    if(!(cin >> n)) return nullptr;
-    Node* head = nullptr;
-    cout << "Nhap cac phan tu cua day b:\n";
-    for (int i = 0; i < n; ++i) {
-        int x; cin >> x;
-        push_back(head, x);
-}
-    return head;
-}
-
+// ===== In danh sách =====
 void printlist(Node* head) {
-    bool first = true;
-    cout << "Merged Sort list:\n";
-    for (Node* cur = head; cur; cur = cur->next) {
-        if (!first) cout << ' ';
-        cout << cur->val;
-        first = false;
-    }
-    cout << '\n';
+    for (Node* cur = head; cur; cur = cur->next)
+        cout << cur->val << " ";
+    cout << "\n";
 }
 
-template <class Object>
-void swapValues(Object &lhs, Object &rhs) {
-    Object tmp = lhs;
-    lhs = rhs;
-    rhs = tmp;
-}
+// ===== Merge Sort cho Linked List =====
+Node* merge(Node* left, Node* right) {
+    if (!left) return right;
+    if (!right) return left;
 
-Node* mergeTwoSortedList(Node* a, Node* b) {
-    if (!a) return b;
-    if (!b) return a;
     Node* head = nullptr;
-    Node* tail = nullptr;
-    if (a->val < b->val) {
-        head = tail = a;
-        a = a->next;
+    if (left->val < right->val) {
+        head = left;
+        left = left->next;
     } else {
-        head = tail = b;
-        b = b->next;
+        head = right;
+        right = right->next;
     }
-    while (a && b) {
-        if (a->val < b->val) {
-            tail->next = a;
-            tail = a;
-            a = a->next;
+
+    Node* tail = head;
+    while (left && right) {
+        if (left->val < right->val) {
+            tail->next = left;
+            left = left->next;
         } else {
-            tail->next = b;
-            tail = b;
-            b = b->next;
+            tail->next = right;
+            right = right->next;
         }
+        tail = tail->next;
     }
-    if (a) tail->next = a;
-    if (b) tail->next = b;
+    tail->next = left ? left : right;
     return head;
 }
 
-template <class Item>
-void selectionSort(Node* head) {
-    for (Node* i = head; i; i = i->next) {
-        Node* mn = i;
-        for (Node* j = i->next; j; j = j->next) {
-            if (j->val < mn->val) mn = j;
-        }
-        if (mn != i) {
-            Item tmp = i->val;
-            i->val = mn->val;
-            mn->val = tmp;
+void splitList(Node* source, Node** frontRef, Node** backRef) {
+    Node* fast = source->next;
+    Node* slow = source;
+    while (fast) {
+        fast = fast->next;
+        if (fast) {
+            slow = slow->next;
+            fast = fast->next;
         }
     }
+    *frontRef = source;
+    *backRef = slow->next;
+    slow->next = nullptr;
 }
 
+Node* mergeSort(Node* head) {
+    if (!head || !head->next) return head;
+    Node *a, *b;
+    splitList(head, &a, &b);
+    a = mergeSort(a);
+    b = mergeSort(b);
+    return merge(a, b);
+}
 
+// ===== MAIN =====
 int main() {
-Node* a = readlist1();
-Node* b = readlist2();
+    int n;
+    cout << "Nhap so phan tu trong danh sach: ";
+    cin >> n;
 
-auto start = chrono::high_resolution_clock::now();
-selectionSort<int>(a);
-selectionSort<int>(b);
-Node* merged = mergeTwoSortedList(a, b);
+    Node* list = randomList(n);
 
-auto end = chrono::high_resolution_clock::now();
-auto duration = chrono::duration_cast<chrono::microseconds>(end - start).count();    
+    cout << "\nDanh sach ngau nhien ban dau:\n";
+    printlist(list);
 
-printlist(merged);
+    // ---- Merge Sort ----
+    auto start = chrono::high_resolution_clock::now();
+    list = mergeSort(list);
+    auto end = chrono::high_resolution_clock::now();
 
-cout << "Elapsed time: " << duration << " microseconds\n";
+    auto dur = chrono::duration_cast<chrono::microseconds>(end - start).count();
 
-// Giai phong bo nho
-while (merged) {
-    Node* tmp = merged;
-    merged = merged->next;
-    delete tmp;
-}
-return 0;
+    cout << "\nDanh sach sau khi sap xep bang Merge Sort:\n";
+    printlist(list);
+    cout << "Thoi gian Merge Sort: " << dur << " microseconds\n";
+
+    // Giải phóng bộ nhớ
+    while (list) {
+        Node* tmp = list;
+        list = list->next;
+        delete tmp;
+    }
+
+    return 0;
 }

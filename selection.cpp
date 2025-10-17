@@ -1,5 +1,7 @@
 #include <iostream>
 #include <chrono>
+#include <cstdlib>  // rand(), srand()
+#include <ctime>    // time()
 using namespace std;
 
 struct Node {
@@ -8,7 +10,7 @@ struct Node {
     Node(int v = 0) : val(v), next(nullptr) {}
 };
 
-// Them vao cuoi danh sach
+// ===== Thêm vào cuối danh sách =====
 void push_back(Node*& head, int v) {
     if (!head) {
         head = new Node(v);
@@ -19,10 +21,9 @@ void push_back(Node*& head, int v) {
     cur->next = new Node(v);
 }
 
-// In danh sach
+// ===== In danh sách =====
 void printList(Node* head) {
     bool first = true;
-    cout << "Selection Sorted list:\n";
     for (Node* cur = head; cur; cur = cur->next) {
         if (!first) cout << ' ';
         cout << cur->val;
@@ -31,21 +32,18 @@ void printList(Node* head) {
     cout << '\n';
 }
 
-// Đọc danh sách: định dạng input: n a1 a2 ... an
-Node* readList() {
-    int n;
-    cout << "Nhap so phan tu:\n";
-    if (!(cin >> n)) return nullptr;
+// ===== Hàm tạo danh sách ngẫu nhiên =====
+Node* randomList(int n) {
     Node* head = nullptr;
-    cout << "Nhap cac phan tu:\n";
+    srand(time(0)); // Seed ngẫu nhiên theo thời gian hiện tại
     for (int i = 0; i < n; ++i) {
-        int x; cin >> x;
+        int x = rand() % 999999; // Sinh số ngẫu nhiên trong [0, 999]
         push_back(head, x);
     }
     return head;
 }
 
-// Hoan doi gia tri
+// ===== Hoán đổi giá trị =====
 template <class Object>
 void swapValues(Object &lhs, Object &rhs) {
     Object tmp = lhs;
@@ -53,7 +51,7 @@ void swapValues(Object &lhs, Object &rhs) {
     rhs = tmp;
 }
 
-// Selection sort dua tren danh sach lien ket
+// ===== Selection Sort trên danh sách liên kết =====
 template <class Item>
 void selectionSort(Node* head) {
     for (Node* i = head; i; i = i->next) {
@@ -65,25 +63,31 @@ void selectionSort(Node* head) {
     }
 }
 
+// ===== MAIN =====
 int main() {
-   
-    
-    // Đọc danh sách
-    Node* head = readList();
-    if (!head) return 0;
+  
 
-        // Sắp xếp và in danh sách
-        // Empirical running time: đo thời gian chạy của thuật toán selection sort
-    auto t0 = std::chrono::high_resolution_clock::now();
+    int n;
+    cout << "Nhap so phan tu muon tao: ";
+    cin >> n;
+
+    // Tạo danh sách ngẫu nhiên
+    Node* head = randomList(n);
+    cout << "Danh sach ngau nhien vua tao:\n";
+    printList(head);
+
+    // Đo thời gian chạy selection sort
+    auto t0 = chrono::high_resolution_clock::now();
     selectionSort<int>(head);
-    auto t1 = std::chrono::high_resolution_clock::now();
-    auto dur_us = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
-        double dur_ms = dur_us / 1000.0;
+    auto t1 = chrono::high_resolution_clock::now();
 
-        printList(head);
+    // Tính thời gian chạy
+    auto dur_us = chrono::duration_cast<chrono::microseconds>(t1 - t0).count();
+    double dur_ms = dur_us / 1000.0;
 
-        // In thời gian chạy
-        cout << "Elapsed time: " << dur_us << " microseconds (" << dur_ms << " ms)\n";
+    cout << "\nDanh sach sau khi sap xep:\n";
+    printList(head);
+    cout << "Elapsed time: " << dur_us << " microseconds (" << dur_ms << " ms)\n";
 
     // Giải phóng bộ nhớ
     while (head) {
@@ -91,5 +95,6 @@ int main() {
         head = head->next;
         delete tmp;
     }
+
     return 0;
 }
