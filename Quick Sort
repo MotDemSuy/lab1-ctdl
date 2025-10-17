@@ -1,5 +1,8 @@
 #include <iostream>
 #include <chrono>
+#include <cstdlib>  // cho rand() và srand()
+#include <ctime>    // cho time()
+using namespace std;
 // Cấu trúc của một nút trong danh sách liên kết
 struct Node {
     int data;
@@ -11,10 +14,10 @@ struct Node {
 // Hàm để in danh sách liên kết
 void printList(Node* head) {
     while (head != nullptr) {
-        std::cout << head->data << " -> ";
+        cout << head->data << " -> ";
         head = head->next;
     }
-    std::cout << "NULL" << std::endl;
+    cout << "NULL" << endl;
 }
 
 // Hàm thêm một nút vào cuối danh sách
@@ -113,27 +116,40 @@ void quickSort(Node** headRef) {
 
 int main() {
     Node* head = nullptr;
-    push(&head, 30);
-    push(&head, 3);
-    push(&head, 4);
-    push(&head, 20);
-    push(&head, 5);
 
-    cout << "Danh sách liên kết ban đầu:" << endl;
-    printList(head);
+    // Khởi tạo seed cho số ngẫu nhiên
+    srand(time(0));  // seed theo thời gian hiện tại
 
-    auto start = chrono::high_resolution_clock::now();
+    const int N = 1000;  // số lượng phần tử ngẫu nhiên
+
+    // Tạo 1000 số ngẫu nhiên và thêm vào danh sách liên kết
+    for (int i = 0; i < N; ++i) {
+        int randomNumber = rand() % 10000;  // số từ 0 đến 9999
+        push(&head, randomNumber);
+    }
+
+    cout << "Dang sap xep danh sach lien ket co " << N << " phan tu..." << endl;
+
+    // Đo thời gian với ctime
+    clock_t start = clock();
 
     quickSort(&head);
 
-    auto end = chrono::high_resolution_clock::now();
+    clock_t end = clock();
 
-    auto duration = chrono::duration_cast<chrono::microseconds>(end - start);
+    double time_taken = double(end - start) / CLOCKS_PER_SEC;
 
-    cout << "Danh sách liên kết sau khi sắp xếp:" << endl;
-    printList(head);
+   cout << "Sap xep hoan tat." << endl;
+   cout << "Thoi gian chay: " << time_taken << " giay" << endl;
+    Node* temp = head;
 
-    cout << "Thời gian chạy (microseconds): " << duration.count() << " µs" << endl;
-
+    int count = 0;
+    while (temp != nullptr && count < 20) {
+    cout << temp->data << " -> ";
+    temp = temp->next;
+    ++count;
+}
+cout << "..." << endl;
     return 0;
+    
 }
