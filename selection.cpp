@@ -1,4 +1,5 @@
 #include <iostream>
+#include <chrono>
 using namespace std;
 
 struct Node {
@@ -71,9 +72,18 @@ int main() {
     Node* head = readList();
     if (!head) return 0;
 
-    // Sắp xếp và in danh sách
+        // Sắp xếp và in danh sách
+        // Empirical running time: đo thời gian chạy của thuật toán selection sort
+    auto t0 = std::chrono::high_resolution_clock::now();
     selectionSort<int>(head);
-    printList(head);
+    auto t1 = std::chrono::high_resolution_clock::now();
+    auto dur_us = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+        double dur_ms = dur_us / 1000.0;
+
+        printList(head);
+
+        // In thời gian chạy
+        cout << "Elapsed time: " << dur_us << " microseconds (" << dur_ms << " ms)\n";
 
     // Giải phóng bộ nhớ
     while (head) {

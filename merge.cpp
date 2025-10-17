@@ -1,4 +1,5 @@
 #include <iostream>
+#include <chrono>
 using namespace std;
 struct Node {
     int val;
@@ -107,9 +108,24 @@ void selectionSort(Node* head) {
 int main() {
 Node* a = readlist1();
 Node* b = readlist2();
+
+auto start = chrono::high_resolution_clock::now();
 selectionSort<int>(a);
 selectionSort<int>(b);
 Node* merged = mergeTwoSortedList(a, b);
-printlist(merged); 
+
+auto end = chrono::high_resolution_clock::now();
+auto duration = chrono::duration_cast<chrono::microseconds>(end - start).count();    
+
+printlist(merged);
+
+cout << "Elapsed time: " << duration << " microseconds\n";
+
+// Giai phong bo nho
+while (merged) {
+    Node* tmp = merged;
+    merged = merged->next;
+    delete tmp;
+}
 return 0;
 }
