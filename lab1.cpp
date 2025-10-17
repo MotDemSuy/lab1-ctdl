@@ -1,5 +1,7 @@
 #include <iostream>
 #include <chrono>
+#include <cstdlib>
+#include <ctime>
 using namespace std;
 using namespace std::chrono;
 
@@ -52,16 +54,37 @@ void bubbleSort(Node* head) {
 }
 
 int main() {
+    srand(time(0)); // khởi tạo seed ngẫu nhiên
     Node* head = nullptr;
-    int n, x;
+    int n, x, choice;
 
     cout << "Nhap so phan tu: ";
     cin >> n;
 
-    cout << "Nhap cac phan tu: ";
-    for (int i = 0; i < n; i++) {
-        cin >> x;
-        append(head, x);
+    cout << "Ban muon:\n";
+    cout << "1. Tu nhap cac phan tu\n";
+    cout << "2. Tao ngau nhien cac phan tu\n";
+    cout << "Lua chon: ";
+    cin >> choice;
+
+    if (choice == 1) {
+        cout << "Nhap cac phan tu: ";
+        for (int i = 0; i < n; i++) {
+            cin >> x;
+            append(head, x);
+        }
+    } 
+    else if (choice == 2) {
+        for (int i = 0; i < n; i++) {
+            int randomValue = rand() % 1000; // tạo số ngẫu nhiên 0–999
+            append(head, randomValue);
+        }
+        cout << "Danh sach ngau nhien: ";
+        printList(head);
+    } 
+    else {
+        cout << "Lua chon khong hop le.\n";
+        return 0;
     }
 
     auto start = high_resolution_clock::now();
