@@ -1,0 +1,131 @@
+#include <iostream>
+
+// Cấu trúc của một nút trong danh sách liên kết
+struct Node {
+    int data;
+    Node* next;
+
+    Node(int val) : data(val), next(nullptr) {}
+};
+
+// Hàm để in danh sách liên kết
+void printList(Node* head) {
+    while (head != nullptr) {
+        std::cout << head->data << " -> ";
+        head = head->next;
+    }
+    std::cout << "NULL" << std::endl;
+}
+
+// Hàm thêm một nút vào cuối danh sách
+void push(Node** head_ref, int new_data) {
+    Node* new_node = new Node(new_data);
+    if (*head_ref == nullptr) {
+        *head_ref = new_node;
+        return;
+    }
+    Node* last = *head_ref;
+    while (last->next != nullptr) {
+        last = last->next;
+    }
+    last->next = new_node;
+}
+
+// Hàm lấy nút cuối cùng của danh sách.
+Node* getTail(Node* current) {
+    while (current != nullptr && current->next != nullptr) {
+        current = current->next;
+    }
+    return current;
+}
+
+// Hàm phân vùng danh sách.
+Node* partition(Node* head, Node* tail, Node** newHead, Node** newTail) {
+    Node* pivot = tail;
+    Node* prev = nullptr;
+    Node* current = head;
+    Node* end = pivot;
+
+    *newHead = nullptr;
+    *newTail = nullptr;
+
+    while (current != pivot) {
+        if (current->data < pivot->data) {
+            if (*newHead == nullptr) {
+                *newHead = current;
+            }
+            prev = current;
+            current = current->next;
+        } else {
+            if (prev) {
+                prev->next = current->next;
+            }
+            Node* temp = current->next;
+            current->next = nullptr;
+            end->next = current;
+            end = current;
+            current = temp;
+        }
+    }
+
+    if (*newHead == nullptr) {
+        *newHead = pivot;
+    }
+
+    *newTail = end;
+
+    return pivot;
+}
+
+// Hàm chính thực hiện Quick Sort
+Node* quickSortRecur(Node* head, Node* tail) {
+    if (!head || head == tail) {
+        return head;
+    }
+
+    Node* newHead = nullptr;
+    Node* newTail = nullptr;
+
+    Node* pivot = partition(head, tail, &newHead, &newTail);
+
+    if (newHead != pivot) {
+        Node* temp = newHead;
+        while (temp->next != pivot) {
+            temp = temp->next;
+        }
+        temp->next = nullptr;
+
+        newHead = quickSortRecur(newHead, temp);
+
+        temp = getTail(newHead);
+        temp->next = pivot;
+    }
+
+    pivot->next = quickSortRecur(pivot->next, newTail);
+
+    return newHead;
+}
+
+// Hàm bao bọc để gọi Quick Sort
+void quickSort(Node** headRef) {
+    *headRef = quickSortRecur(*headRef, getTail(*headRef));
+}
+
+int main() {
+    Node* head = nullptr;
+    push(&head, 30);
+    push(&head, 3);
+    push(&head, 4);
+    push(&head, 20);
+    push(&head, 5);
+
+    std::cout << "Danh sách liên kết ban đầu:" << std::endl;
+    printList(head);
+
+    quickSort(&head);
+
+    std::cout << "Danh sách liên kết sau khi sắp xếp:" << std::endl;
+    printList(head);
+
+    return 0;
+}
